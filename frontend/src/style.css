@@ -1,0 +1,624 @@
+/* ============================================================================
+   Gestionale Manutenzioni - Design System
+   ----------------------------------------------------------------------------
+   Conforme alle Web Content Accessibility Guidelines (WCAG) 2.1 livello AA
+   - Contrasto minimo 4.5:1 per testo, 3:1 per UI/grafica
+   - Focus visibili con anello a 3px e offset
+   - Supporto prefers-reduced-motion e prefers-color-scheme
+   - Tipografia scalabile basata su rem
+   ========================================================================== */
+
+/* ----------------------------------------------------------------------------
+   Design tokens
+   -------------------------------------------------------------------------- */
+:root {
+  /* Palette primaria — verde "manutenzione" con contrasto AA su bianco */
+  --color-primary-50:  #e8f5ee;
+  --color-primary-100: #c4e6d3;
+  --color-primary-200: #97d3b2;
+  --color-primary-300: #5fbb87;
+  --color-primary-400: #2fa166;
+  --color-primary-500: #0f7a47; /* AA su bianco: 5.27:1 */
+  --color-primary-600: #0c6238;
+  --color-primary-700: #0a4d2c;
+  --color-primary-800: #073920;
+  --color-primary-900: #042113;
+
+  /* Stato semantico (tutti AA su bianco) */
+  --color-success:        #0f7a47;
+  --color-success-bg:     #e8f5ee;
+  --color-warning:        #8a5a00;
+  --color-warning-bg:     #fff4d6;
+  --color-danger:         #b3261e;
+  --color-danger-bg:      #fce8e6;
+  --color-info:           #1e5a8a;
+  --color-info-bg:        #e3f1fb;
+
+  /* Grigi accessibili */
+  --color-text:           #1a1a1a; /* AA: 16.1:1 su bianco */
+  --color-text-muted:     #4a4a4a; /* AA: 9.5:1  su bianco */
+  --color-text-subtle:    #6b6b6b; /* AA: 5.8:1  su bianco */
+  --color-text-inverse:   #ffffff;
+  --color-bg:             #ffffff;
+  --color-bg-alt:         #f7f8f9;
+  --color-bg-elevated:    #ffffff;
+  --color-border:         #c8ccd1;
+  --color-border-strong:  #8b9197;
+  --color-overlay:        rgba(15, 23, 35, 0.55);
+
+  /* Focus ring — distintivo dai colori della UI */
+  --color-focus:          #0050b3; /* AA: 7.5:1 */
+  --focus-ring-width:     3px;
+  --focus-ring-offset:    2px;
+
+  /* Tipografia */
+  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto,
+               'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, 'Liberation Mono',
+               monospace;
+  --font-size-xs:   0.75rem;
+  --font-size-sm:   0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg:   1.125rem;
+  --font-size-xl:   1.25rem;
+  --font-size-2xl:  1.5rem;
+  --font-size-3xl:  1.875rem;
+  --font-size-4xl:  2.25rem;
+  --line-height-tight: 1.25;
+  --line-height-base:  1.55;
+
+  /* Spaziature (multipli di 4px) */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+
+  /* Radii e ombre */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-pill: 999px;
+  --shadow-sm: 0 1px 2px rgba(15, 23, 35, 0.06);
+  --shadow-md: 0 4px 12px rgba(15, 23, 35, 0.08);
+  --shadow-lg: 0 12px 32px rgba(15, 23, 35, 0.12);
+
+  /* Transizioni */
+  --transition-fast: 150ms ease;
+  --transition-base: 250ms ease;
+
+  /* Override Bootstrap */
+  --bs-primary:        var(--color-primary-500);
+  --bs-primary-rgb:    15, 122, 71;
+  --bs-link-color:     var(--color-primary-600);
+  --bs-link-hover-color: var(--color-primary-700);
+  --bs-body-color:     var(--color-text);
+  --bs-body-bg:        var(--color-bg);
+  --bs-border-color:   var(--color-border);
+}
+
+/* Modalità ad alto contrasto (utenti che la richiedono via OS) */
+@media (prefers-contrast: more) {
+  :root {
+    --color-text-muted: #2a2a2a;
+    --color-border:     #4a4a4a;
+    --focus-ring-width: 4px;
+  }
+}
+
+/* Modalità ridotto-movimento */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ----------------------------------------------------------------------------
+   Reset & base
+   -------------------------------------------------------------------------- */
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  font-size: 100%;
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-base);
+  color: var(--color-text);
+  background-color: var(--color-bg-alt);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+  line-height: var(--line-height-tight);
+  color: var(--color-text);
+  margin-top: 0;
+  margin-bottom: var(--space-3);
+}
+h1 { font-size: var(--font-size-3xl); }
+h2 { font-size: var(--font-size-2xl); }
+h3 { font-size: var(--font-size-xl); }
+h4 { font-size: var(--font-size-lg); }
+
+p { margin-top: 0; margin-bottom: var(--space-4); }
+
+a {
+  color: var(--color-primary-600);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color var(--transition-fast);
+}
+a:hover { color: var(--color-primary-700); }
+
+/* ----------------------------------------------------------------------------
+   Focus universale (WCAG 2.4.7)
+   -------------------------------------------------------------------------- */
+:focus { outline: none; }
+:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus);
+  outline-offset: var(--focus-ring-offset);
+  border-radius: var(--radius-sm);
+}
+
+/* Focus interno per controlli con sfondo scuro */
+.btn-primary:focus-visible,
+.bg-primary :focus-visible {
+  outline-color: #ffffff;
+  box-shadow: 0 0 0 var(--focus-ring-width) var(--color-focus);
+}
+
+/* ----------------------------------------------------------------------------
+   Skip link — primo elemento focusabile (WCAG 2.4.1)
+   -------------------------------------------------------------------------- */
+.skip-link {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--color-primary-700);
+  color: var(--color-text-inverse);
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 0 0 var(--radius-md) 0;
+  transform: translateY(-100%);
+  transition: transform var(--transition-base);
+  z-index: 9999;
+}
+.skip-link:focus,
+.skip-link:focus-visible {
+  transform: translateY(0);
+  outline: var(--focus-ring-width) solid #ffffff;
+  outline-offset: -1px;
+  color: var(--color-text-inverse);
+}
+
+/* ----------------------------------------------------------------------------
+   Utility: contenuti solo per screen reader
+   -------------------------------------------------------------------------- */
+.visually-hidden,
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+.visually-hidden-focusable:not(:focus):not(:focus-within) {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+/* ----------------------------------------------------------------------------
+   Layout: navbar e footer
+   -------------------------------------------------------------------------- */
+.navbar {
+  background-color: var(--color-primary-700) !important;
+  box-shadow: var(--shadow-sm);
+}
+.navbar .navbar-brand {
+  color: var(--color-text-inverse) !important;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+.navbar .nav-link {
+  color: rgba(255, 255, 255, 0.92) !important;
+  font-weight: 500;
+  padding: var(--space-2) var(--space-3) !important;
+  border-radius: var(--radius-sm);
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+}
+.navbar .nav-link:hover,
+.navbar .nav-link:focus-visible {
+  background-color: var(--color-primary-600);
+  color: var(--color-text-inverse) !important;
+}
+.navbar .nav-link[aria-current='page'],
+.navbar .router-link-active {
+  background-color: var(--color-primary-500);
+  color: var(--color-text-inverse) !important;
+}
+.navbar .dropdown-menu {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  padding: var(--space-2);
+}
+.navbar .dropdown-item {
+  border-radius: var(--radius-sm);
+  padding: var(--space-2) var(--space-3);
+  color: var(--color-text);
+}
+.navbar .dropdown-item:hover,
+.navbar .dropdown-item:focus-visible {
+  background-color: var(--color-primary-50);
+  color: var(--color-primary-700);
+}
+
+footer {
+  background-color: var(--color-bg);
+  border-top: 1px solid var(--color-border);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  padding: var(--space-4) 0;
+}
+
+/* ----------------------------------------------------------------------------
+   Container
+   -------------------------------------------------------------------------- */
+.wider-container {
+  max-width: 1440px;
+  margin-inline: auto;
+  padding-inline: var(--space-4);
+}
+
+/* ----------------------------------------------------------------------------
+   Bottoni — override Bootstrap con stati accessibili
+   -------------------------------------------------------------------------- */
+.btn {
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid transparent;
+  transition: background-color var(--transition-fast),
+              border-color var(--transition-fast),
+              color var(--transition-fast),
+              box-shadow var(--transition-fast);
+}
+.btn-primary,
+.bg-primary {
+  background-color: var(--color-primary-500) !important;
+  border-color: var(--color-primary-500) !important;
+  color: var(--color-text-inverse) !important;
+}
+.btn-primary:hover,
+.btn-primary:focus-visible {
+  background-color: var(--color-primary-600) !important;
+  border-color: var(--color-primary-600) !important;
+}
+.btn-primary:disabled,
+.btn-primary.disabled {
+  background-color: var(--color-primary-200) !important;
+  border-color: var(--color-primary-200) !important;
+  color: var(--color-text-inverse) !important;
+}
+.btn-outline-primary {
+  background-color: transparent;
+  border-color: var(--color-primary-500);
+  color: var(--color-primary-600);
+}
+.btn-outline-primary:hover,
+.btn-outline-primary:focus-visible {
+  background-color: var(--color-primary-500);
+  color: var(--color-text-inverse);
+}
+.btn-danger {
+  background-color: var(--color-danger);
+  border-color: var(--color-danger);
+}
+.btn-danger:hover {
+  background-color: #8d1e18;
+  border-color: #8d1e18;
+}
+
+/* ----------------------------------------------------------------------------
+   Form
+   -------------------------------------------------------------------------- */
+.form-label {
+  font-weight: 600;
+  margin-bottom: var(--space-2);
+  color: var(--color-text);
+}
+.form-label .required-mark::after {
+  content: ' *';
+  color: var(--color-danger);
+}
+.form-control,
+.form-select {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--font-size-base);
+  color: var(--color-text);
+  background-color: var(--color-bg);
+  transition: border-color var(--transition-fast),
+              box-shadow var(--transition-fast);
+}
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--color-focus);
+  box-shadow: 0 0 0 var(--focus-ring-width) rgba(0, 80, 179, 0.2);
+  outline: none;
+}
+.form-control[aria-invalid='true'],
+.form-select[aria-invalid='true'],
+.is-invalid {
+  border-color: var(--color-danger) !important;
+}
+.form-text {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+.form-check-input {
+  width: 1.15rem;
+  height: 1.15rem;
+  border: 1px solid var(--color-border-strong);
+  cursor: pointer;
+}
+.form-check-input:checked {
+  background-color: var(--color-primary-500);
+  border-color: var(--color-primary-500);
+}
+.form-check-label { cursor: pointer; }
+
+/* Messaggi di errore visibili e legibili (WCAG 3.3.1 / 3.3.3) */
+.invalid-feedback,
+.error-message {
+  display: block;
+  color: var(--color-danger);
+  background-color: var(--color-danger-bg);
+  border-left: 4px solid var(--color-danger);
+  padding: var(--space-2) var(--space-3);
+  margin-top: var(--space-2);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+}
+
+/* ----------------------------------------------------------------------------
+   Card e contenitori
+   -------------------------------------------------------------------------- */
+.card {
+  background-color: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+.card-header {
+  background-color: var(--color-bg-alt);
+  border-bottom: 1px solid var(--color-border);
+  font-weight: 600;
+}
+
+/* ----------------------------------------------------------------------------
+   Tabelle
+   -------------------------------------------------------------------------- */
+.table {
+  --bs-table-color: var(--color-text);
+  --bs-table-bg:    var(--color-bg);
+  border-collapse: separate;
+  border-spacing: 0;
+}
+.table > :not(caption) > * > * {
+  padding: var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+}
+.table thead th {
+  background-color: var(--color-bg-alt);
+  color: var(--color-text);
+  font-weight: 700;
+  text-align: left;
+  border-bottom: 2px solid var(--color-border-strong);
+}
+.table tbody tr:hover {
+  background-color: var(--color-primary-50);
+}
+.table caption {
+  caption-side: top;
+  font-weight: 600;
+  color: var(--color-text);
+  padding: var(--space-2) 0;
+}
+.table-responsive-sm {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+  box-shadow: var(--shadow-sm);
+  max-height: 500px;
+}
+.table.table-sm td,
+.table.table-sm th {
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--font-size-sm);
+}
+
+/* Badge stato accessibili */
+.badge-stato {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 0.25rem 0.6rem;
+  border-radius: var(--radius-pill);
+  font-weight: 600;
+  font-size: var(--font-size-xs);
+  border: 1px solid transparent;
+}
+.badge-stato.ok      { background-color: var(--color-success-bg); color: var(--color-success); border-color: var(--color-success); }
+.badge-stato.warn    { background-color: var(--color-warning-bg); color: var(--color-warning); border-color: var(--color-warning); }
+.badge-stato.danger  { background-color: var(--color-danger-bg);  color: var(--color-danger);  border-color: var(--color-danger); }
+.badge-stato.info    { background-color: var(--color-info-bg);    color: var(--color-info);    border-color: var(--color-info); }
+
+/* Stati legacy (mantengono compat con codice esistente) — non basati sul solo colore */
+.ritardo {
+  background-color: var(--color-danger-bg) !important;
+  color: var(--color-danger) !important;
+  font-weight: 600;
+  border-left: 4px solid var(--color-danger);
+}
+.ritardo::before {
+  content: '⚠';
+  margin-right: var(--space-1);
+  speak: literal-punctuation;
+}
+.NotValidate {
+  background-color: var(--color-warning-bg) !important;
+  color: var(--color-warning) !important;
+  font-weight: 600;
+  border-left: 4px solid var(--color-warning);
+}
+.NotValidate::before {
+  content: '◐';
+  margin-right: var(--space-1);
+}
+.bg-tuple-auto {
+  background-color: transparent !important;
+  color: inherit !important;
+}
+
+/* ----------------------------------------------------------------------------
+   Calendario
+   -------------------------------------------------------------------------- */
+.calendar-container {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.calendar-wrapper {
+  max-width: 1100px;
+  margin: auto;
+  padding: var(--space-5);
+  background-color: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+.qalendar {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-base);
+}
+.qalendar .event-title {
+  font-weight: 600;
+  color: var(--color-text);
+}
+.qalendar .event {
+  background-color: var(--color-primary-600) !important;
+  color: var(--color-text-inverse);
+  border: 1px solid var(--color-primary-700);
+  border-radius: var(--radius-sm);
+  padding: 0.3rem var(--space-2);
+}
+.qalendar .event:focus,
+.qalendar .event:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+/* ----------------------------------------------------------------------------
+   Chart cards
+   -------------------------------------------------------------------------- */
+.chart-container {
+  height: 500px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition-base), box-shadow var(--transition-base);
+}
+.chart-container:hover,
+.chart-container:focus-within {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* ----------------------------------------------------------------------------
+   Pagina "Not found" e stati vuoti
+   -------------------------------------------------------------------------- */
+.not-found-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 100px);
+  padding: var(--space-6);
+  background-color: var(--color-bg-alt);
+}
+.not-found-card {
+  background: var(--color-bg);
+  padding: var(--space-7);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  max-width: 500px;
+  width: 100%;
+  text-align: center;
+}
+@media (max-width: 768px) {
+  .not-found-card { padding: var(--space-5); }
+}
+
+/* ----------------------------------------------------------------------------
+   Toolbar e gruppi input
+   -------------------------------------------------------------------------- */
+.multiselect { margin-bottom: var(--space-4); }
+.input-group { gap: var(--space-2); }
+.allarga { font-size: var(--font-size-lg); }
+
+/* ----------------------------------------------------------------------------
+   Transizioni Vue (rispettano prefers-reduced-motion sopra)
+   -------------------------------------------------------------------------- */
+.title-fade-enter-active { transition: opacity 0.6s ease 0.4s; }
+.title-fade-enter-from   { opacity: 0; }
+
+.card-fade-enter-active,
+.card-fade-leave-active  { transition: opacity 0.5s ease, transform 0.5s ease; }
+.card-fade-enter-from,
+.card-fade-leave-to      { opacity: 0; transform: translateY(20px); }
+
+.alert-slide-fade-enter-active,
+.alert-slide-fade-leave-active { transition: all 0.4s ease; }
+.alert-slide-fade-enter-from,
+.alert-slide-fade-leave-to    { transform: translateY(-10px); opacity: 0; }
+
+/* ----------------------------------------------------------------------------
+   Print styles
+   -------------------------------------------------------------------------- */
+@media print {
+  .navbar, footer, .skip-link { display: none !important; }
+  body { background: #fff; color: #000; }
+  .card, .table-responsive-sm, .chart-container { box-shadow: none; }
+}

@@ -1,0 +1,27 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: auth-service
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://postgres:5432/auth_db}
+    username: ${DB_USER:gestionale}
+    password: ${DB_PASSWORD:gestionale}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    open-in-view: false
+
+security:
+  jwt:
+    secret: ${ENCRYPTION_KEY:chiave-di-sviluppo-non-usare-in-produzione}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info

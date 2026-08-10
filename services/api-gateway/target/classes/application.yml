@@ -1,0 +1,53 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_UNIQUE
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOriginPatterns: "*"
+            allowedMethods: [GET, POST, PUT, DELETE, OPTIONS]
+            allowedHeaders: "*"
+            allowCredentials: true
+      routes:
+        # ---- auth-service: autenticazione + anagrafica dipendenti/operatori ----
+        - id: auth-service
+          uri: ${AUTH_SERVICE_URI:http://auth-service:8081}
+          predicates:
+            - Path=/api/auth/**,/api/VisualizzaDipendente,/api/CreaDipendente,/api/ModificaDipendente/**,/api/CancellaDipendente/**
+
+        # ---- anagrafiche-service: risorse, fornitori, articoli, cause guasto ----
+        - id: anagrafiche-service
+          uri: ${ANAGRAFICHE_SERVICE_URI:http://anagrafiche-service:8082}
+          predicates:
+            - Path=/api/VisualizzaRisorse,/api/FiltraRisorsa/**,/api/CreaRisorsa,/api/ModificaRisorsa/**,/api/CancellaRisorsa/**,/api/VisualizzaFornitore,/api/CreaFornitore,/api/ModificaFornitore/**,/api/CancellaFornitore/**,/api/VisualizzazioneArticoli,/api/CreaArticoli,/api/ModificaArticoli/**,/api/CancellaArticoli/**,/api/VisualizzaGuasti,/api/CreaGuasto,/api/ModificaGuasto/**,/api/CancellaGuasto/**
+
+        # ---- manutenzioni-service: manutenzioni, interventi, home, consultazioni, AI ----
+        - id: manutenzioni-service
+          uri: ${MANUTENZIONI_SERVICE_URI:http://manutenzioni-service:8083}
+          predicates:
+            - Path=/api/VisualizzaManutenzioni,/api/CreaManutenzione,/api/ModificaManutenzione/**,/api/CancellaManutenzione/**,/api/VisualizzaInterventi,/api/CancellaIntervento/**,/api/VisualizzaInterventiEsterni,/api/CreaIntervento,/api/Modificaintervento/**,/api/VisualizzaInterventoById/**,/api/InterventiCalendario,/api/InterventiNonValidati,/api/InterventiRitardo,/api/genera-interventi,/api/ConsCosto,/api/ConsStoricoInterventi,/api/storico-ricambi,/api/ConsumoComponenti,/api/OreLavorateDip,/api/OrelavoratePerRis,/api/delayOperativo
+
+        # ---- fatturazione-service: fatture ----
+        - id: fatturazione-service
+          uri: ${FATTURAZIONE_SERVICE_URI:http://fatturazione-service:8084}
+          predicates:
+            - Path=/api/VisualizzazioneFatture,/api/CreaFattura,/api/ModificaFattura/**,/api/CancellaFattura/**
+
+        # ---- ai-agent-service (deployato in cloud): ingest richieste intervento da email/LLM ----
+        - id: ai-agent-service
+          uri: ${AIAGENT_SERVICE_URI:http://ai-agent-service:8085}
+          predicates:
+            - Path=/api/CreaInterventoAI
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,gateway

@@ -1,0 +1,21 @@
+# Deploy alternativo su Fly.io:  fly launch --dockerfile services/ai-agent-service/Dockerfile
+app = "gestionale-ai-agent"
+primary_region = "mad"
+
+[build]
+  dockerfile = "services/ai-agent-service/Dockerfile"
+
+[env]
+  SPRING_PROFILES_ACTIVE = "cloud"
+  EMAIL_ENABLED = "false"
+
+[http_service]
+  internal_port = 8085
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
+
+# I segreti si impostano con:
+#   fly secrets set KAFKA_BOOTSTRAP_SERVERS=... KAFKA_API_KEY=... KAFKA_API_SECRET=... OPEN_AI_KEY=...
+[[services.http_checks]]
+  path = "/actuator/health"

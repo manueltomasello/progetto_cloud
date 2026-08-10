@@ -1,6 +1,0 @@
-# Docker / ambiente
-.env
-docker-compose.override.yml
-
-# SQL init (contiene dati sensibili)
-database/*.sql

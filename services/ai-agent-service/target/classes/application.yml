@@ -1,0 +1,32 @@
+server:
+  port: 8085
+
+spring:
+  application:
+    name: ai-agent-service
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:kafka:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.add.type.headers: false
+
+ai-agent:
+  openai:
+    api-key: ${OPEN_AI_KEY:}
+    model: ${OPENAI_MODEL:gpt-4o-mini}
+    base-url: ${OPENAI_BASE_URL:https://api.openai.com/v1}
+  email:
+    enabled: ${EMAIL_ENABLED:false}
+    host: ${EMAIL_HOST:}
+    port: ${EMAIL_PORT:993}
+    user: ${EMAIL_USER:}
+    password: ${EMAIL_PASS:}
+    poll-ms: ${EMAIL_POLL_MS:120000}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info

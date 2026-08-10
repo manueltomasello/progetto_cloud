@@ -4,7 +4,6 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 
 COPY frontend/ .
-COPY backend/public/img/ ./img/ 
 
 COPY package*.json ./
 RUN npm install

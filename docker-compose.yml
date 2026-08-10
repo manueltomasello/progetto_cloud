@@ -1,8 +1,148 @@
-version: "3.9"
+# =====================================================================
+#  Gestionale Manutenzioni - Architettura a MICROSERVIZI
+#  Avvia l'intero sistema distribuito:
+#    - PostgreSQL (un database per microservizio)
+#    - Broker Kafka (KRaft, senza Zookeeper) per la comunicazione a eventi
+#    - 5 microservizi di dominio (Spring Boot) + API Gateway
+#    - Frontend Vue servito da nginx
+#
+#  Avvio:  docker compose up --build
+#  Frontend:  http://localhost        (login: admin / admin123)
+#  Gateway:   http://localhost:8080
+# =====================================================================
 
 services:
 
-  # ─── Frontend Vue (nginx) ────────────────────────
+  # --------------- Infrastruttura: database ---------------
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${DB_USER:-gestionale}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-gestionale}
+      POSTGRES_DB: gestionale
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./db-init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-gestionale}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  # --------------- Infrastruttura: broker Kafka (KRaft) ---------------
+  # Immagine ufficiale Apache: le immagini gratuite bitnami/* sono state
+  # dismesse (spostate su bitnamilegacy/) da agosto 2025.
+  kafka:
+    image: apache/kafka:3.8.1
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: "broker,controller"
+      KAFKA_LISTENERS: "PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093"
+      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://kafka:9092"
+      KAFKA_CONTROLLER_LISTENER_NAMES: "CONTROLLER"
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT"
+      KAFKA_CONTROLLER_QUORUM_VOTERS: "1@kafka:9093"
+      KAFKA_INTER_BROKER_LISTENER_NAME: "PLAINTEXT"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+    restart: unless-stopped
+
+  # --------------- Microservizi di dominio ---------------
+  auth-service:
+    build: ./services/auth-service
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/auth_db
+      DB_USER: ${DB_USER:-gestionale}
+      DB_PASSWORD: ${DB_PASSWORD:-gestionale}
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY:-chiave-di-sviluppo-cambiami}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  anagrafiche-service:
+    build: ./services/anagrafiche-service
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/anagrafiche_db
+      DB_USER: ${DB_USER:-gestionale}
+      DB_PASSWORD: ${DB_PASSWORD:-gestionale}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  manutenzioni-service:
+    build: ./services/manutenzioni-service
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/manutenzioni_db
+      DB_USER: ${DB_USER:-gestionale}
+      DB_PASSWORD: ${DB_PASSWORD:-gestionale}
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    restart: unless-stopped
+
+  fatturazione-service:
+    build: ./services/fatturazione-service
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/fatturazione_db
+      DB_USER: ${DB_USER:-gestionale}
+      DB_PASSWORD: ${DB_PASSWORD:-gestionale}
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # AI Agent: nel compose gira in locale, ma e' il microservizio pensato per il
+  # deploy in cloud (vedi deploy/cloud/). Comunica solo tramite Kafka.
+  ai-agent-service:
+    build: ./services/ai-agent-service
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      OPEN_AI_KEY: ${OPEN_AI_KEY:-}
+      EMAIL_ENABLED: ${EMAIL_ENABLED:-false}
+      EMAIL_HOST: ${EMAIL_HOST:-}
+      EMAIL_USER: ${EMAIL_USER:-}
+      EMAIL_PASS: ${EMAIL_PASS:-}
+      EMAIL_PORT: ${EMAIL_PORT:-993}
+    depends_on:
+      kafka:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # --------------- API Gateway ---------------
+  api-gateway:
+    build: ./services/api-gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - auth-service
+      - anagrafiche-service
+      - manutenzioni-service
+      - fatturazione-service
+      - ai-agent-service
+    restart: unless-stopped
+
+  # --------------- Frontend Vue (nginx) ---------------
   frontend:
     build:
       context: "."
@@ -10,51 +150,8 @@ services:
     ports:
       - "80:80"
     depends_on:
-      - backend
-    restart: unless-stopped
-
-  # ─── Backend Node/Express ────────────────────────
-  backend:
-    build: ./backend
-    ports:
-      - "3000:3000"
-    environment:
-      - NODE_ENV=production
-      - DB_SERVER=sqlserver
-      - DB_PORT=1433
-      - DB_USER=${DB_USER}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - DB_NAME=${DB_NAME}
-      - OPEN_AI_KEY=${OPEN_AI_KEY}
-      - EMAIL_USER=${EMAIL_USER}
-      - EMAIL_PASS=${EMAIL_PASS}
-      - EMAIL_HOST=${EMAIL_HOST}
-      - EMAIL_PORT=${EMAIL_PORT}
-      - ENCRYPTION_KEY=${ENCRYPTION_KEY}
-    depends_on:
-      sqlserver:
-        condition: service_healthy
-    restart: unless-stopped
-
-  # ─── SQL Server 2022 ─────────────────────────────
-  sqlserver:
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    environment:
-      - ACCEPT_EULA=Y
-      - SA_PASSWORD=${DB_PASSWORD}
-      - MSSQL_PID=Express
-    ports:
-      - "1433:1433"       # utile per connettersi con SSMS durante lo sviluppo
-    volumes:
-      - sqlserver_data:/var/opt/mssql
-      - ./database:/docker-entrypoint-initdb.d   # script SQL di init
-    healthcheck:
-      test: ["CMD", "/opt/mssql-tools18/bin/sqlcmd", "-S", "localhost",
-             "-U", "sa", "-P", "${DB_PASSWORD}", "-Q", "SELECT 1", "-No"]
-      interval: 10s
-      timeout: 5s
-      retries: 10
+      - api-gateway
     restart: unless-stopped
 
 volumes:
-  sqlserver_data:
+  postgres_data:

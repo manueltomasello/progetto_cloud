@@ -1,0 +1,12 @@
+# Profilo "cloud": collega il servizio a un broker Kafka gestito (SASL_SSL).
+# Attivare con SPRING_PROFILES_ACTIVE=cloud e le variabili KAFKA_* impostate.
+spring:
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
+    properties:
+      security.protocol: SASL_SSL
+      sasl.mechanism: PLAIN
+      sasl.jaas.config: >
+        org.apache.kafka.common.security.plain.PlainLoginModule required
+        username="${KAFKA_API_KEY}"
+        password="${KAFKA_API_SECRET}";

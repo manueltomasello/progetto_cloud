@@ -1,0 +1,13 @@
+# Profilo "cloud": attivare con SPRING_PROFILES_ACTIVE=cloud quando l'ai-agent
+# viene deployato su un provider e deve collegarsi a un broker Kafka gestito
+# (Confluent Cloud, Redpanda Cloud, Aiven, ...) tramite SASL_SSL.
+spring:
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
+    properties:
+      security.protocol: SASL_SSL
+      sasl.mechanism: PLAIN
+      sasl.jaas.config: >
+        org.apache.kafka.common.security.plain.PlainLoginModule required
+        username="${KAFKA_API_KEY}"
+        password="${KAFKA_API_SECRET}";

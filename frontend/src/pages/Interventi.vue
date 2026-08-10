@@ -184,7 +184,7 @@ export default defineComponent({
 
       // Sceglie se fare una POST (nuovo) o PUT (modifica)
       const axiosCall = this.selectedIntervento 
-        ? axios.put(`/api/ModificaIntervento/${this.selectedIntervento.IntId}`, payload)
+        ? axios.put(`/api/Modificaintervento/${this.selectedIntervento.IntId}`, payload)
         : axios.post('/api/CreaIntervento', payload);
 
       axiosCall

@@ -1,0 +1,25 @@
+# Deploy dell'ai-agent-service su Render (https://render.com) come servizio Docker.
+# Il servizio viene buildato dal Dockerfile del microservizio e si collega a un
+# broker Kafka gestito tramite il profilo Spring "cloud".
+services:
+  - type: web
+    name: gestionale-ai-agent
+    runtime: docker
+    repo: https://github.com/<utente>/progetto_cloud
+    dockerfilePath: ./services/ai-agent-service/Dockerfile
+    dockerContext: ./services/ai-agent-service
+    plan: free
+    healthCheckPath: /actuator/health
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: cloud
+      - key: KAFKA_BOOTSTRAP_SERVERS
+        sync: false          # es. pkc-xxxx.europe-west1.gcp.confluent.cloud:9092
+      - key: KAFKA_API_KEY
+        sync: false
+      - key: KAFKA_API_SECRET
+        sync: false
+      - key: OPEN_AI_KEY
+        sync: false
+      - key: EMAIL_ENABLED
+        value: "false"

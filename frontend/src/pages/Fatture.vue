@@ -40,7 +40,7 @@ export default defineComponent({
   methods: {
 
     fetchInterventi() {
-      axios.get('/api/visualizzaInterventiEsterni')
+      axios.get('/api/VisualizzaInterventiEsterni')
         .then(response => {
           this.interventi = response.data;
         })
@@ -71,8 +71,8 @@ export default defineComponent({
       const requestData: Fattura = { ...this.form };
 
       const request = this.selectedFattura
-        ? axios.put(`/api/modificaFattura/${this.selectedFattura.NFatt}`, requestData)
-        : axios.post('/api/creaFattura', requestData);
+        ? axios.put(`/api/ModificaFattura/${this.selectedFattura.NFatt}`, requestData)
+        : axios.post('/api/CreaFattura', requestData);
 
       request
         .then(() => {

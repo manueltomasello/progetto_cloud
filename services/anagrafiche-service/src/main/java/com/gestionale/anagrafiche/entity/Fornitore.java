@@ -1,5 +1,7 @@
 package com.gestionale.anagrafiche.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -7,9 +9,11 @@ import jakarta.persistence.*;
 public class Fornitore {
     @Id
     @Column(name = "IdFornitore", length = 5)
+    @JsonProperty("IdFornitore")
     private String idFornitore;
 
     @Column(name = "RagSoc", nullable = false, length = 100)
+    @JsonProperty("RagSoc")
     private String ragSoc;
 
     public String getIdFornitore() { return idFornitore; }

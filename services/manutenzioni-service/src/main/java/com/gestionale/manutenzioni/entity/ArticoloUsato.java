@@ -1,5 +1,7 @@
 package com.gestionale.manutenzioni.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 
@@ -7,8 +9,10 @@ import jakarta.persistence.Embeddable;
 @Embeddable
 public class ArticoloUsato {
     @Column(name = "ArtId")
+    @JsonProperty("ArtId")
     private Integer artId;
     @Column(name = "qta")
+    @JsonProperty("qta")
     private Integer qta;
 
     public ArticoloUsato() {}

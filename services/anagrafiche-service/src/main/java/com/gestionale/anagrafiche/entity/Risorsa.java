@@ -1,5 +1,7 @@
 package com.gestionale.anagrafiche.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 
@@ -9,15 +11,19 @@ import java.math.BigDecimal;
 public class Risorsa {
     @Id
     @Column(name = "NomeRisorsa")
+    @JsonProperty("NomeRisorsa")
     private Integer nomeRisorsa;
 
     @Column(name = "ModMacc", nullable = false, length = 100)
+    @JsonProperty("ModMacc")
     private String modMacc;
 
     @Column(name = "DescMacc", columnDefinition = "text")
+    @JsonProperty("DescMacc")
     private String descMacc;
 
     @Column(name = "CostoOrarioFermo", nullable = false, precision = 10, scale = 2)
+    @JsonProperty("CostoOrarioFermo")
     private BigDecimal costoOrarioFermo = BigDecimal.ZERO;
 
     public Integer getNomeRisorsa() { return nomeRisorsa; }

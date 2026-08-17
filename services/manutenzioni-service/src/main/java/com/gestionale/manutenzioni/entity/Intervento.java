@@ -1,5 +1,7 @@
 package com.gestionale.manutenzioni.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -18,59 +20,75 @@ public class Intervento {
 
     @Id
     @Column(name = "IntId", length = 15)
+    @JsonProperty("IntId")
     private String intId;
 
     @Column(name = "ManId", nullable = false)
+    @JsonProperty("ManId")
     private Integer manId = 0;
 
     @Column(name = "DataIntPrev", nullable = false)
+    @JsonProperty("DataIntPrev")
     private LocalDate dataIntPrev;
 
     @Column(name = "DataIntEff")
+    @JsonProperty("DataIntEff")
     private LocalDate dataIntEff;
 
     @Column(name = "TmpInt")
+    @JsonProperty("TmpInt")
     private Integer tmpInt;
 
     @Column(name = "OraInizio")
+    @JsonProperty("OraInizio")
     private LocalTime oraInizio;
 
     @Column(name = "OraFine")
+    @JsonProperty("OraFine")
     private LocalTime oraFine;
 
     @Column(name = "EsitoMan", nullable = false)
+    @JsonProperty("EsitoMan")
     private Boolean esitoMan = false;
 
     @Column(name = "ValidataMan", nullable = false)
+    @JsonProperty("ValidataMan")
     private Boolean validataMan = false;
 
     @Column(name = "noteIntervento", columnDefinition = "text")
+    @JsonProperty("noteIntervento")
     private String noteIntervento;
 
     @Column(name = "TipoGuastoId")
+    @JsonProperty("TipoGuastoId")
     private Integer tipoGuastoId;
 
     @Column(name = "OriginInt", nullable = false)
+    @JsonProperty("OriginInt")
     private Integer originInt = 0;
 
     @Column(name = "NomeRisorsaInt", nullable = false)
+    @JsonProperty("NomeRisorsaInt")
     private Integer nomeRisorsaInt;
 
     @ElementCollection
     @CollectionTable(name = "interventi_dipendenti",
             joinColumns = @JoinColumn(name = "IntId"))
     @Column(name = "IdDip")
+    @JsonProperty("Dipendenti")
     private List<Integer> dipendenti = new ArrayList<>();
 
     @ElementCollection
     @CollectionTable(name = "interventi_esterni",
             joinColumns = @JoinColumn(name = "IntId"))
     @Column(name = "IdFornitore")
+    @JsonProperty("FornitoriEsterni")
     private List<String> fornitoriEsterni = new ArrayList<>();
 
     @ElementCollection
     @CollectionTable(name = "interventi_articoli",
             joinColumns = @JoinColumn(name = "IntId"))
+    @JsonProperty("ArticoliUsati")
     private List<ArticoloUsato> articoliUsati = new ArrayList<>();
 
     public String getIntId() { return intId; }

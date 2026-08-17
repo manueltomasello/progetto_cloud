@@ -1,5 +1,7 @@
 package com.gestionale.manutenzioni.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.*;
 import java.time.LocalDate;
 
@@ -9,28 +11,36 @@ public class Manutenzione {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ManId")
+    @JsonProperty("ManId")
     private Integer manId;
 
     // Riferimento "soft" alla risorsa (di proprieta' di anagrafiche-service)
     @Column(name = "MaccIdMan", nullable = false)
+    @JsonProperty("MaccIdMan")
     private Integer maccIdMan;
 
     @Column(name = "Tipo", nullable = false, length = 20)
+    @JsonProperty("Tipo")
     private String tipo;
 
     @Column(name = "FreqGiorni")
+    @JsonProperty("FreqGiorni")
     private Integer freqGiorni;
 
     @Column(name = "DescMan", columnDefinition = "text")
+    @JsonProperty("DescMan")
     private String descMan;
 
     @Column(name = "noteMan", columnDefinition = "text")
+    @JsonProperty("noteMan")
     private String noteMan;
 
     @Column(name = "DataInserimento", nullable = false)
+    @JsonProperty("DataInserimento")
     private LocalDate dataInserimento = LocalDate.now();
 
     @Column(name = "DurataSTAT", nullable = false)
+    @JsonProperty("DurataSTAT")
     private Integer durataSTAT = 0;
 
     public Integer getManId() { return manId; }

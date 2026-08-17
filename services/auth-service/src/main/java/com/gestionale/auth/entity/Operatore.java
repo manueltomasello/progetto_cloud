@@ -1,5 +1,7 @@
 package com.gestionale.auth.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
@@ -16,18 +18,23 @@ public class Operatore {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "IdDip")
+    @JsonProperty("IdDip")
     private Integer idDip;
 
     @Column(name = "Matricola", nullable = false)
+    @JsonProperty("Matricola")
     private Integer matricola;
 
     @Column(name = "NomeDip", nullable = false, length = 100)
+    @JsonProperty("NomeDip")
     private String nomeDip;
 
     @Column(name = "CognDip", nullable = false, length = 100)
+    @JsonProperty("CognDip")
     private String cognDip;
 
     @Column(name = "EmailDip", length = 150)
+    @JsonProperty("EmailDip")
     private String emailDip;
 
     // Non viene mai serializzato verso il client
@@ -36,15 +43,19 @@ public class Operatore {
     private String passDip;
 
     @Column(name = "CostoOrario", nullable = false, precision = 10, scale = 2)
+    @JsonProperty("CostoOrario")
     private BigDecimal costoOrario = BigDecimal.ZERO;
 
     @Column(name = "ruolo", nullable = false, length = 10)
+    @JsonProperty("ruolo")
     private String ruolo = "user";
 
     @Column(name = "username", nullable = false, length = 50)
+    @JsonProperty("username")
     private String username;
 
     @Column(name = "abilitato", nullable = false)
+    @JsonProperty("abilitato")
     private Integer abilitato = 1;
 
     public Integer getIdDip() { return idDip; }

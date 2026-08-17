@@ -1,5 +1,7 @@
 package com.gestionale.anagrafiche.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 
@@ -9,21 +11,27 @@ public class ArticoloConsumabile {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "Articolo")
+    @JsonProperty("Articolo")
     private Integer articolo;
 
     @Column(name = "NomeArt", nullable = false, length = 100)
+    @JsonProperty("NomeArt")
     private String nomeArt;
 
     @Column(name = "DescArtBreve", columnDefinition = "text")
+    @JsonProperty("DescArtBreve")
     private String descArtBreve;
 
     @Column(name = "DescArtLunga", columnDefinition = "text")
+    @JsonProperty("DescArtLunga")
     private String descArtLunga;
 
     @Column(name = "Udm", nullable = false, length = 10)
+    @JsonProperty("Udm")
     private String udm = "pezzi";
 
     @Column(name = "PrezzoStandard", nullable = false, precision = 10, scale = 2)
+    @JsonProperty("PrezzoStandard")
     private BigDecimal prezzoStandard = BigDecimal.ZERO;
 
     public Integer getArticolo() { return articolo; }

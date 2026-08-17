@@ -1,12 +1,17 @@
-# Profilo "cloud": collega il servizio a un broker Kafka gestito (SASL_SSL).
+# Profilo "cloud": collega il servizio a un broker Kafka gestito.
 # Attivare con SPRING_PROFILES_ACTIVE=cloud e le variabili KAFKA_* impostate.
+#
+# Configurato per Redpanda Cloud (SASL_SSL + SCRAM-SHA-256).
+# Se invece usi un broker con SASL/PLAIN (es. Confluent Cloud), imposta
+# KAFKA_SASL_MECHANISM=PLAIN e sostituisci ScramLoginModule con
+# org.apache.kafka.common.security.plain.PlainLoginModule.
 spring:
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
     properties:
       security.protocol: SASL_SSL
-      sasl.mechanism: PLAIN
+      sasl.mechanism: ${KAFKA_SASL_MECHANISM:SCRAM-SHA-256}
       sasl.jaas.config: >
-        org.apache.kafka.common.security.plain.PlainLoginModule required
+        org.apache.kafka.common.security.scram.ScramLoginModule required
         username="${KAFKA_API_KEY}"
         password="${KAFKA_API_SECRET}";
